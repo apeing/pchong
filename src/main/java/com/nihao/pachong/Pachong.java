@@ -25,24 +25,13 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
-
-/**
- * Hello world!
- *
- */
-public class App 
-{
-//	int index = 1;//解析层次
+public class Pachong {
 	List<String> info_urls = new ArrayList<String>();//爬取的详情的url集合
 	List<String> info_urls2 = new ArrayList<String>();//爬取商户的url集合
-	List<Map<String, String>> mapones = new ArrayList<Map<String, String>>();
 	
 	public Dianping runcraw(String urlstr,int index){
 		Dianping obj = new Dianping();
@@ -70,18 +59,17 @@ public class App
             //	System.out.println(itemstr);
             	if(itemstr.html().contains("var gid=")){
             		String jwstr = itemstr.html().toString();
-                    System.out.println("shopjw: " + jwstr);
+              //      System.out.println("shopjw: " + jwstr);
                     int li = jwstr.indexOf("lng:");
                     String[] arrstr = jwstr.substring(li+4).split(",");
                     obj.setLng(arrstr[0]);
                     int wi = arrstr[1].indexOf("}");
                     String lat = arrstr[1].substring(4,wi);
                     obj.setLat(lat);
-                    System.out.println("shopjw.j,w : " + arrstr[0] +" " + lat);
+              //      System.out.println("shopjw.j,w : " + arrstr[0] +" " + lat);
                     break;
             	}
-            }
-            
+            }            
             //教师风采
             ArrayList<Teacher> shoptheachers = new ArrayList<Teacher>();    
             Elements eteachers = doc.getElementsByClass("mod teachers J_teachers");
@@ -89,11 +77,6 @@ public class App
             Elements teachers = eteachers.select("ul>li");
             for(Element item : teachers){
             	Teacher teacherobj = new Teacher();
-            	System.out.println("item.name : " + item.select("div>div.name").text());
-            	System.out.println("item.img : " + item.select("div>img").attr("lazy-src"));
-            	System.out.println("item.year : " + item.select("div>div.intro>span.year").text());
-            	System.out.println("item.type : " + item.select("div>div.intro>span.type").text());
-            	System.out.println("item.detail : " + item.select("div>div.detail").text());
             	teacherobj.setName(item.select("div>div.name").text());
             	teacherobj.setImg(item.select("div>img").attr("lazy-src"));
             	teacherobj.setYear(item.select("div>div.intro>span.year").text());
@@ -107,7 +90,7 @@ public class App
             Elements pics = epics.select("ul>li");
             for(Element item : pics){
             	Shoppicture picobj = new Shoppicture();
-            	System.out.println("item.name : " + item.select("div>img").attr("lazy-src"));
+      //      	System.out.println("item.name : " + item.select("div>img").attr("lazy-src"));
             	picobj.setImg(item.select("div>img").attr("lazy-src"));
             	shoppictures.add(picobj);
             }
@@ -130,7 +113,7 @@ public class App
             	Shopmedia mediaobj = new Shopmedia();
             	String url = item.select("div.item").attr("data-video");
             	String title = item.select("div.item>div.title").text();
-            	System.out.println("item-media : " + url + " " + title);
+     //       	System.out.println("item-media : " + url + " " + title);
             	mediaobj.setUrl(url);
             	mediaobj.setTitle(title);
             	shopmedias.add(mediaobj);
@@ -144,7 +127,7 @@ public class App
             //用户点评
             ArrayList<Comment> shopcomments = new ArrayList<Comment>();
             Elements eranks = doc.getElementsByClass("comment-star");
-            System.out.println("comment-star : " + eranks.select("em").text());
+   //         System.out.println("comment-star : " + eranks.select("em").text());
             Elements ecomments = doc.getElementsByClass("content othercontent J_content");
             for(Element item : ecomments){
             	Comment objcomment = new Comment();
@@ -156,7 +139,7 @@ public class App
             	ArrayList<String> pictmps = new ArrayList<String>();
             	for(Element itempic : compics){
             		pictmps.add(itempic.select("img").attr("lazy-src"));
-            		System.out.println("comment-img : " + itempic.select("img").attr("lazy-src"));
+        //    		System.out.println("comment-img : " + itempic.select("img").attr("lazy-src"));
             	}
             	objcomment.setImgurls(pictmps);
             	shopcomments.add(objcomment);
@@ -173,17 +156,14 @@ public class App
             obj.setShopPictures(shoppictures);
             obj.setShopmedias(shopmedias);
             obj.setShopcomments(shopcomments);
-//            System.out.println("shopname : " + obj.getshopname());
-//            System.out.println("shopaddress : " + obj.getShopAddress());
-//            System.out.println("shopphone : " + obj.getShopPhone());
-//            System.out.println("shopinfo : " + obj.getShopInfo());
-      //      return obj;
+
         } catch (IOException e) {
             e.printStackTrace();
         }
 		return obj;
 	}
-    /**
+	
+	/**
      * 爬取网页
      * 返回符合规则的新url
      * @param urlStr
@@ -192,7 +172,6 @@ public class App
     public String crawler(String urlStr,int index){
         String str = "";  //用于接收爬取到的网页
         String newUrl = "";  //用于接收返回的符合规则的新url
-       
         URL url;
         int responsecode;
         HttpURLConnection urlConnection;
@@ -208,7 +187,7 @@ public class App
             responsecode=urlConnection.getResponseCode();
             if(responsecode==200){
                 //得到输入流，即获得了网页的内容
-            	System.out.println("return 200 : " + urlConnection.getInputStream());
+     //       	System.out.println("return 200 : " + urlConnection.getInputStream());
                 reader=new BufferedReader(new InputStreamReader(urlConnection.getInputStream(),"UTF-8"));
                 while((line=reader.readLine())!=null){
                     str += line;
@@ -219,6 +198,8 @@ public class App
                     newUrl = analysis(str);
                 }if(index == 2){
                 	newUrl = analysis2(str);
+                }else{
+    
                 }
 
             }else{
@@ -228,8 +209,8 @@ public class App
             System.out.println("获取不到网页的源码,出现异常："+e);
         }
         return newUrl;
-
     }
+    
     /**
      * ================================================================================================================
      * 解析html
@@ -239,30 +220,18 @@ public class App
 
         //假设我们获取的HTML的字符内容如下
         String html = str;
+
         //第一步，将字符内容解析成一个Document类
         Document doc = Jsoup.parse(html);
         Elements elements1 = doc.getElementsByClass("edu-nav J_edu-nav");
-   //     Elements doc1 = elements1.select("a.name");
-        Elements doc1 = elements1.select("li");
+        Elements doc1 = elements1.select("a.name");
 //        System.out.println("elements1 : " + doc1);
         for ( Element element : doc1 ){
-        	//info_urls.add("http://www.dianping.com" + element.attr("href"));
-        	Map<String, String> mapone = new HashMap<String, String>();
-        	mapone.put("url","http://www.dianping.com" + element.select("a.name").attr("href"));
-        	mapone.put("type",element.select("a.name").text());
-        	mapones.add(mapone);
-        	System.out.println("element1 : " + element.select("a.name").text());
-        	for( Element item : element.select("a.item")){
-        		Map<String, String> maptwo = new HashMap<String, String>();
-        		maptwo.put("url","http://www.dianping.com" + item.attr("href"));
-        		maptwo.put("type",element.select("a.name").text() + "," + item.text());
-        		mapones.add(maptwo);
-        		System.out.println("element2 : " + item.text());
-        	}
-        	
+        	info_urls.add("http://www.dianping.com" + element.attr("href"));
         }
         return "ok";
     }
+    
     /**
      * 解析第二层html
      *
@@ -285,93 +254,4 @@ public class App
     //    System.out.println("doc1 : " + info_urls);
         return "ok";
     }  
-    
-    /**
-     * 解析第三层html
-     *
-     */
-    public String analysis3(String str){
-
-        //假设我们获取的HTML的字符内容如下
-        String html = str;
-
-        //第一步，将字符内容解析成一个Document类
-        Document doc = Jsoup.parse(html);
-//        Elements elements1 = doc.getElementsByClass("shop-name");
-//        Elements shopname = elements1.select("h1");
-        System.out.println("shopname : " + doc);
-      
-        //第二步，根据我们需要得到的标签，选择提取相应标签的内容
-
-//        System.out.println("doc1 : " + info_urls);
-        return "OK";
-    }      
-    /**
-     * 解析第三层html
-     * @throws IOException 
-     * @throws UnsupportedEncodingException 
-     *
-     */
-    public String writeobj(String str) throws IOException{
-    	BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("d:\\2.txt",true),"UTF-8"));
-        out.write(str);
-        out.write("\r\n");
-        out.close();
-    	return "ok";
-    }
-    public static void main( String[] args ) throws IOException{
-    	//写入相应的文件
-    	App app = new App();
-    //	app.runcraw("http://www.dianping.com/shop/9038889",3);
-    	String urlnew = app.crawler("http://www.dianping.com/chengdu/education",1);
-    
-    	for (Map<String, String> v : app.mapones){
-    		
-    		System.out.println("url= " + v.get("url"));
-    		System.out.println("type= " + v.get("type"));
-    	}
-        System.out.println("ok");
-    } 
- /*   public static void main( String[] args ) throws IOException, InterruptedException
-    {
-    	App app = new App();
-    	String urlnew = app.crawler("http://www.dianping.com/chengdu/education",1);//http://www.dianping.com/chengdu/ch75/g2872
-    	System.out.println("urlnew : " + urlnew);
- //   	app.crawler(app.info_urls.get(0),2);
-    	for(String item : app.info_urls){
-    	//	System.out.println(item);
-    		String urlnew2 = app.crawler(item,2);
-    //		System.out.println("urlnew2 : " + urlnew2);
-    	}
-    	System.out.println("info_urls2.size : " + app.info_urls2.size());
-    	for(String item : app.info_urls2){
-    		Dianping dobj = app.runcraw(item,3);
-        	String dstr = "shopname:" + dobj.getshopname() + "\r\n";
-        	dstr += "shopaddress:" + dobj.getShopAddress() + "\r\n";
-        	dstr += "shopphone:" + dobj.getShopPhone() + "\r\n";
-        	dstr += "shopinfo:";
-        	for(String item1 : dobj.getShopInfo()){
-        		dstr += item1;
-        	}
-        	dstr += "\r\nshopcourses:";
-        	for(Course item2 : dobj.getShopCourses()){
-        		dstr += " 价格:" + item2.getCur();
-        		dstr += " 课程名称:" + item2.getTitle();
-        		dstr += " 描述:" + item2.getDesc();
-        		dstr += " 封面图片" + item2.getImg();
-        		dstr += " 地址:" + item2.getAddress() + "\r\n";
-        	}
-        	app.writeobj(dstr);
-        	System.out.println("say hello to world at " + new Date());
-        	Thread.sleep(5000);
-    	}
-    	
-    	System.out.println("ok");
-//    	for(String item : app.info_urls2){
-//    		String urlnew = app.runcraw("http://www.dianping.com/shop/100980726",3);
-//    	}
-//    	app.crawler("http://www.dianping.com/chengdu/ch25/g136",1);
-        
-    } */ 
-    
 }
