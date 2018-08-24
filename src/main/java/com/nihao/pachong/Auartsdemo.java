@@ -5,6 +5,7 @@ import static org.quartz.JobBuilder.newJob;
 import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
 import static org.quartz.TriggerBuilder.newTrigger;
 
+import java.util.Date;
 import java.util.GregorianCalendar;
 
 import org.quartz.JobDetail;
@@ -16,7 +17,10 @@ import org.quartz.impl.calendar.AnnualCalendar;
 public class Auartsdemo {
 
 	
-/*	public static void main( String[] args ){
+	public static void main( String[] args ){
+		String str = "地址： 天府大道北段8号苏宁广场·城市奥特莱斯4层";
+		 System.out.println("say hello to :"+ str.substring(4,str.length()-4));
+	/*	
 		try {
             //创建scheduler
             Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
@@ -46,6 +50,6 @@ public class Auartsdemo {
             scheduler.shutdown(true);
         } catch (Exception e) {
             e.printStackTrace();
-        }
-	} */
+        } */
+	} 
 }

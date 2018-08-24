@@ -11,6 +11,8 @@ import com.nihao.pachong.model.Teacher;
 @SuppressWarnings("serial")
 public class Dianping implements java.io.Serializable{
 	private Long id;//商户id
+
+	private String banner;//商户banner
 	
     private String shopphone;//电话
 
@@ -83,6 +85,14 @@ public class Dianping implements java.io.Serializable{
     public void setshopname(String shopname) {
         this.shopname = shopname;
     }
+    
+	public String getBanner() {
+		return banner;
+	}
+
+	public void setBanner(String banner) {
+		this.banner = banner;
+	}
     
     public ArrayList<String> getShopInfo(){
     	return shopinfo;

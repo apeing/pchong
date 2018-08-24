@@ -5,12 +5,37 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
+import java.util.Map;
 
 
 public class Mysqldemo {
-
-	
 	public static void main( String[] args ) throws SQLException{
+	   	//写入相应的文件
+		Pachong app = new Pachong();
+    //	app.runcraw("http://www.dianping.com/shop/9038889",3);
+    	List<Map<String, String>> urlnew = app.crawler("http://www.dianping.com/chengdu/education",1);
+    	Connection connection = MysqlConnPool.getInstance().getConnection();
+    	ResultSet rs = MysqlHelper.executeQuery(connection, "select max(id) from traintype");
+    	if (rs.next()){
+    	//	String str = rs.getString(1);
+        //    System.out.println(str);
+        //    int num = Integer.parseInt(str) + 1;
+        //    System.out.println(num);
+	    	for (Map<String, String> v : urlnew){
+	    		String insertstr1 = "insert into traintype(name,topclass) values('";
+            	insertstr1 +=  v.get("type")+ "'," + v.get("topclass") + ")";
+            	MysqlHelper.executeUpdate(connection, insertstr1);
+	    		System.out.println("url= " + v.get("url"));
+	    		System.out.println("type= " + v.get("type"));
+	    		
+	    	}
+    	}
+    	connection.close();
+        System.out.println("ok");
+	}
+	
+/*	public static void main( String[] args ) throws SQLException{
 		System.out.println( "Hello World!" );
         Connection conn = null;
         String sql;
@@ -40,5 +65,5 @@ public class Mysqldemo {
             conn.close();
         }
 
-	}
+	}*/
 }

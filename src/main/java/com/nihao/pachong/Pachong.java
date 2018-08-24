@@ -25,19 +25,21 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Pachong {
 	List<String> info_urls = new ArrayList<String>();//爬取的详情的url集合
 	List<String> info_urls2 = new ArrayList<String>();//爬取商户的url集合
-	
+//	List<Map<String, String>> mapones = new ArrayList<Map<String, String>>();
 	public Dianping runcraw(String urlstr,int index){
 		Dianping obj = new Dianping();
 		Connection conn = Jsoup.connect(urlstr);
         // 修改http包中的header,伪装成浏览器进行抓取
-		conn.header("Cookie", "_lxsdk_cuid=164f9acba13c8-0d814121742ee8-6f16107f-1fa400-164f9acba13c8; _lxsdk=164f9acba13c8-0d814121742ee8-6f16107f-1fa400-164f9acba13c8; _hc.v=2f9d8e40-7d78-3cec-428c-c73ff7951921.1533197204; __mta=46071579.1533197962954.1533197962954.1533198217226.2; _tr.u=szUIdZ0APn0Wxxvk; cityid=1; citypinyin=shanghai; cityname=5LiK5rW3; Hm_lvt_dbeeb675516927da776beeb1d9802bd4=1533197796,1533518649,1533778098; aburl=1; __utma=1.1738877636.1534238653.1534238653.1534238653.1; __utmz=1.1534238653.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); cy=8; cye=chengdu; s_ViewType=10; _lx_utm=utm_source%3DBaidu%26utm_medium%3Dorganic; Hm_lvt_4c4fc10949f0d691f3a2cc4ca5065397=1533864102,1534210893,1534297007,1534382742; Hm_lpvt_4c4fc10949f0d691f3a2cc4ca5065397=1534382742; __utma=205923334.611835561.1534382841.1534382841.1534382841.1; __utmc=205923334; __utmz=205923334.1534382841.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); looyu_id=c9f67c91afae8acb262c64411ff9a6b3f8_51868%3A1; _lxsdk_s=%7C%7C0");
+		conn.header("Cookie", "_lxsdk_cuid=164f9acba13c8-0d814121742ee8-6f16107f-1fa400-164f9acba13c8; _lxsdk=164f9acba13c8-0d814121742ee8-6f16107f-1fa400-164f9acba13c8; _hc.v=2f9d8e40-7d78-3cec-428c-c73ff7951921.1533197204; __mta=46071579.1533197962954.1533197962954.1533198217226.2; _tr.u=szUIdZ0APn0Wxxvk; cityid=1; citypinyin=shanghai; cityname=5LiK5rW3; aburl=1; __utma=1.1738877636.1534238653.1534238653.1534238653.1; __utmz=1.1534238653.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); cy=8; cye=chengdu; s_ViewType=10; __utma=205923334.611835561.1534382841.1534382841.1534382841.1; __utmz=205923334.1534382841.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); looyu_id=c9f67c91afae8acb262c64411ff9a6b3f8_51868%3A1; Hm_lvt_dbeeb675516927da776beeb1d9802bd4=1533197796,1533518649,1533778098,1534471239; _lx_utm=utm_source%3DBaidu%26utm_medium%3Dorganic; Hm_lvt_4c4fc10949f0d691f3a2cc4ca5065397=1534744574,1534815972,1534924455,1534987297; Hm_lpvt_4c4fc10949f0d691f3a2cc4ca5065397=1534987297; _lxsdk_s=165645f3d91-3a1-9be-c6a%7C%7C40");
         conn.header("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.62 Safari/537.36");
         Document doc = null;
         try {
@@ -52,7 +54,10 @@ public class Pachong {
             ArrayList<String> tmpinfo = new ArrayList<String>();
             ArrayList<Course> shopcourses = new ArrayList<Course>();
             Elements shopcourses1 = doc.getElementsByClass("item notag");
-            
+            Element banner = doc.getElementById("basicInfoPic");
+            //banner图片
+            Elements bannerpic = banner.select("img");
+            obj.setBanner(bannerpic.attr("src").toString());
             //爬取经纬度
             Elements shopjw = doc.select("script");
             for(Element itemstr : shopjw){
@@ -169,9 +174,10 @@ public class Pachong {
      * @param urlStr
      * @return
      */
-    public String crawler(String urlStr,int index){
+    public List<Map<String, String>> crawler(String urlStr,int index){
         String str = "";  //用于接收爬取到的网页
-        String newUrl = "";  //用于接收返回的符合规则的新url
+     //   String newUrl = "";  //用于接收返回的符合规则的新url
+        List<Map<String, String>> maptmp = new ArrayList<Map<String, String>>();
         URL url;
         int responsecode;
         HttpURLConnection urlConnection;
@@ -195,9 +201,9 @@ public class Pachong {
    //             System.out.println("str : " + str);
                 //解析html
                 if(index == 1){
-                    newUrl = analysis(str);
+                	maptmp = analysis(str);
                 }if(index == 2){
-                	newUrl = analysis2(str);
+                	maptmp = analysis2(str);
                 }else{
     
                 }
@@ -208,7 +214,7 @@ public class Pachong {
         }catch(Exception e){
             System.out.println("获取不到网页的源码,出现异常："+e);
         }
-        return newUrl;
+        return maptmp;
     }
     
     /**
@@ -216,42 +222,84 @@ public class Pachong {
      * 解析html
      * 返回新url
      */
-    public String analysis(String str){
+    public List<Map<String, String>> analysis(String str){
 
+    	List<Map<String, String>> maptmp = new ArrayList<Map<String, String>>();
         //假设我们获取的HTML的字符内容如下
         String html = str;
 
         //第一步，将字符内容解析成一个Document类
         Document doc = Jsoup.parse(html);
         Elements elements1 = doc.getElementsByClass("edu-nav J_edu-nav");
-        Elements doc1 = elements1.select("a.name");
+   //     Elements doc1 = elements1.select("a.name");
+//        System.out.println("elements1 : " + doc1);
+        
+      //培训类型
+        Elements doc1 = elements1.select("li");
 //        System.out.println("elements1 : " + doc1);
         for ( Element element : doc1 ){
-        	info_urls.add("http://www.dianping.com" + element.attr("href"));
+        	//info_urls.add("http://www.dianping.com" + element.attr("href"));
+        	Map<String, String> mapone = new HashMap<String, String>();
+        	mapone.put("url","http://www.dianping.com" + element.select("a.name").attr("href"));
+        	mapone.put("type",element.select("a.name").text());
+        	mapone.put("topclass","1");
+        	mapone.put("ptype","");
+        	maptmp.add(mapone);
+      //  	System.out.println("element1 : " + element.select("a.name").text());
+        	for( Element item : element.select("a.item")){
+        		Map<String, String> maptwo = new HashMap<String, String>();
+        		maptwo.put("url","http://www.dianping.com" + item.attr("href"));
+        		maptwo.put("type",item.text());
+        		maptwo.put("topclass","0");
+        		maptwo.put("ptype",element.select("a.name").text());
+        		maptmp.add(maptwo);
+        //		System.out.println("element2 : " + item.text());
+        	}
+        	
         }
-        return "ok";
+        
+        return maptmp;
     }
     
     /**
      * 解析第二层html
      *
      */
-    public String analysis2(String str){
-
+    public List<Map<String, String>> analysis2(String str){
+    	List<Map<String, String>> maptwos = new ArrayList<Map<String, String>>();
         //假设我们获取的HTML的字符内容如下
         String html = str;
 
         //第一步，将字符内容解析成一个Document类
         Document doc = Jsoup.parse(html);
-        Elements elements1 = doc.getElementsByClass("tit");
-        Elements doc1 = elements1.select("a[data-hippo-type=\"shop\"]");
-     //   System.out.println("analysis2 : " + doc1);
+        //     Elements elements1 = doc.getElementsByClass("tit");
+        Elements elements1 = doc.select("#shop-all-list");
+        Elements doc1 = elements1.select("li");
         for ( Element element : doc1 ){
-        	info_urls2.add(element.attr("href"));
+        	//url地址
+        	Map<String, String> mapobj = new HashMap<String, String>();
+        	Elements urladdress = element.select("a[data-hippo-type=\"shop\"]");
+        	info_urls2.add(urladdress.attr("href"));
+        	mapobj.put("url",urladdress.attr("href"));
+        	//评论条数
+        	Elements commentsnum = element.getElementsByClass("review-num");
+        	mapobj.put("commentsnum",commentsnum.select("b").text());
+        	//stars数量
+        	Elements stars = element.select("div.comment>span");
+        	
+        	String regEx="[^0-9]"; 
+        	Pattern p = Pattern.compile(regEx);
+        	Matcher m = p.matcher(stars.attr("class"));
+        	mapobj.put("stars",m.replaceAll("").trim());
+        	//评分
+        	Elements comments = element.select("span.comment-list>span");
+        	for(Element obj : comments){
+        		String tmp = obj.select("span").text().trim();
+        		mapobj.put(tmp.substring(0,2),tmp.substring(2,5));
+        	}
+        	maptwos.add(mapobj);
         }
         //第二步，根据我们需要得到的标签，选择提取相应标签的内容
-
-    //    System.out.println("doc1 : " + info_urls);
-        return "ok";
+        return maptwos;
     }  
 }

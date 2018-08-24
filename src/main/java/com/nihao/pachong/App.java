@@ -42,7 +42,8 @@ public class App
 //	int index = 1;//解析层次
 	List<String> info_urls = new ArrayList<String>();//爬取的详情的url集合
 	List<String> info_urls2 = new ArrayList<String>();//爬取商户的url集合
-	List<Map<String, String>> mapones = new ArrayList<Map<String, String>>();
+//	List<Map<String, String>> mapones = new ArrayList<Map<String, String>>();
+//	List<Map<String, String>> maptwos = new ArrayList<Map<String, String>>();
 	
 	public Dianping runcraw(String urlstr,int index){
 		Dianping obj = new Dianping();
@@ -189,10 +190,10 @@ public class App
      * @param urlStr
      * @return
      */
-    public String crawler(String urlStr,int index){
+    public List<Map<String, String>> crawler(String urlStr,int index){
         String str = "";  //用于接收爬取到的网页
-        String newUrl = "";  //用于接收返回的符合规则的新url
-       
+ //       String newUrl = "";  //用于接收返回的符合规则的新url
+        List<Map<String, String>> maptmp = new ArrayList<Map<String, String>>();
         URL url;
         int responsecode;
         HttpURLConnection urlConnection;
@@ -216,9 +217,9 @@ public class App
    //             System.out.println("str : " + str);
                 //解析html
                 if(index == 1){
-                    newUrl = analysis(str);
+                	maptmp = analysis(str);
                 }if(index == 2){
-                	newUrl = analysis2(str);
+                	maptmp = analysis2(str);
                 }
 
             }else{
@@ -227,7 +228,7 @@ public class App
         }catch(Exception e){
             System.out.println("获取不到网页的源码,出现异常："+e);
         }
-        return newUrl;
+        return maptmp;
 
     }
     /**
@@ -235,14 +236,16 @@ public class App
      * 解析html
      * 返回新url
      */
-    public String analysis(String str){
+    public List<Map<String, String>> analysis(String str){
 
+    	List<Map<String, String>> maptmp = new ArrayList<Map<String, String>>();
         //假设我们获取的HTML的字符内容如下
         String html = str;
         //第一步，将字符内容解析成一个Document类
         Document doc = Jsoup.parse(html);
         Elements elements1 = doc.getElementsByClass("edu-nav J_edu-nav");
    //     Elements doc1 = elements1.select("a.name");
+        //培训类型
         Elements doc1 = elements1.select("li");
 //        System.out.println("elements1 : " + doc1);
         for ( Element element : doc1 ){
@@ -250,40 +253,71 @@ public class App
         	Map<String, String> mapone = new HashMap<String, String>();
         	mapone.put("url","http://www.dianping.com" + element.select("a.name").attr("href"));
         	mapone.put("type",element.select("a.name").text());
-        	mapones.add(mapone);
+        	mapone.put("top","1");
+        	mapone.put("pname","no");
+        	maptmp.add(mapone);
         	System.out.println("element1 : " + element.select("a.name").text());
         	for( Element item : element.select("a.item")){
         		Map<String, String> maptwo = new HashMap<String, String>();
         		maptwo.put("url","http://www.dianping.com" + item.attr("href"));
-        		maptwo.put("type",element.select("a.name").text() + "," + item.text());
-        		mapones.add(maptwo);
-        		System.out.println("element2 : " + item.text());
+        		maptwo.put("type",item.text());
+        		maptwo.put("top","2");
+        		maptwo.put("pname",element.select("a.name").text());
+        		maptmp.add(maptwo);
         	}
         	
         }
-        return "ok";
+        return maptmp;
     }
     /**
      * 解析第二层html
      *
      */
-    public String analysis2(String str){
+    public List<Map<String, String>> analysis2(String str){
 
+    	List<Map<String, String>> maptwos = new ArrayList<Map<String, String>>();
         //假设我们获取的HTML的字符内容如下
         String html = str;
-
+        
         //第一步，将字符内容解析成一个Document类
         Document doc = Jsoup.parse(html);
-        Elements elements1 = doc.getElementsByClass("tit");
-        Elements doc1 = elements1.select("a[data-hippo-type=\"shop\"]");
-     //   System.out.println("analysis2 : " + doc1);
+   //     Elements elements1 = doc.getElementsByClass("tit");
+        Elements elements1 = doc.select("#shop-all-list");
+        Elements doc1 = elements1.select("li");
         for ( Element element : doc1 ){
-        	info_urls2.add(element.attr("href"));
+        	//url地址
+        	Map<String, String> mapobj = new HashMap<String, String>();
+        	Elements urladdress = element.select("a[data-hippo-type=\"shop\"]");
+//        	 System.out.println("urladdress : " + urladdress.attr("href"));
+        	info_urls2.add(urladdress.attr("href"));
+        	mapobj.put("url",urladdress.attr("href"));
+        	//stars数量
+        	Elements stars = element.select("div.comment>span");
+//        	System.out.println("stars : " + stars.attr("class"));
+        	String regEx="[^0-9]"; 
+        	Pattern p = Pattern.compile(regEx);
+        	Matcher m = p.matcher(stars.attr("class"));
+     //   	System.out.println( m.replaceAll("").trim());
+        	mapobj.put("stars",m.replaceAll("").trim());
+        	//评分
+        	Elements comments = element.select("span.comment-list>span");
+        	for(Element obj : comments){
+        		String tmp = obj.select("span").text().trim();
+ //       		System.out.println(tmp.substring(0,2));
+ //       		System.out.println(tmp.substring(2,5));
+        		mapobj.put(tmp.substring(0,2),tmp.substring(2,5));
+        	}
+        	maptwos.add(mapobj);
+ //       	for(Map<String, String> item : maptwos){
+  //      		System.out.println(item.get("stars"));
+  //      		System.out.println(item.get("师资"));
+  //      	}
         }
+        
         //第二步，根据我们需要得到的标签，选择提取相应标签的内容
 
     //    System.out.println("doc1 : " + info_urls);
-        return "ok";
+        return maptwos;
     }  
     
     /**
@@ -322,13 +356,22 @@ public class App
     public static void main( String[] args ) throws IOException{
     	//写入相应的文件
     	App app = new App();
+    	List<Map<String, String>> mapfirst = new ArrayList<Map<String, String>>();
     //	app.runcraw("http://www.dianping.com/shop/9038889",3);
-    	String urlnew = app.crawler("http://www.dianping.com/chengdu/education",1);
-    
-    	for (Map<String, String> v : app.mapones){
-    		
-    		System.out.println("url= " + v.get("url"));
-    		System.out.println("type= " + v.get("type"));
+    	mapfirst = app.crawler("http://www.dianping.com/chengdu/education",1);
+    	
+    //	app.crawler("http://www.dianping.com/chengdu/ch75/g3030",2);
+    	for (Map<String, String> fir : mapfirst){
+    		System.out.println("url= " + fir.get("url"));
+    		List<Map<String, String>> mapsecond = new ArrayList<Map<String, String>>();
+    		mapsecond = app.crawler(fir.get("url"),2);
+    		for(Map<String, String> sec : mapsecond){
+    			System.out.println("stars= " + sec.get("stars"));
+    			System.out.println("师资= " + sec.get("师资"));
+    			System.out.println("效果= " + sec.get("效果"));
+    			System.out.println("环境= " + sec.get("环境"));
+    			app.runcraw("http://www.dianping.com/shop/9038889",3);
+    		}
     	}
         System.out.println("ok");
     } 
