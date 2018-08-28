@@ -25,10 +25,15 @@ public class Oracledemo {
 		Connection connection = OracleConnPool.getConnection();
 		List<Map<String, String>> urlnew = app.crawler("http://www.dianping.com/chengdu/education",1);
     	ResultSet rs = MysqlHelper.executeQuery(connection, "select max(id) from TRAIN_TYPE");
+    	
     	if (rs.next()){
     		String str = rs.getString(1);
+    		System.out.println(str);
+    		int num = 1 ;
+    		if(str != null & str != ""){
+    			num = Integer.parseInt(str) + 1;
+    		}
         //    System.out.println(str);
-            int num = Integer.parseInt(str) + 1;
             System.out.println(num);
 	    	for (Map<String, String> v : urlnew){
 	    		String insertstr1 = "insert into TRAIN_TYPE(ID,TRAIN_TYPE_NAME,IS_LEAF,STATE) values(";
@@ -38,6 +43,7 @@ public class Oracledemo {
 	    		System.out.println("type= " + v.get("type"));
 	    		num++;
 	    	}
+    		
     	}
 		connection.close();
 	}
