@@ -22,7 +22,17 @@ public class Dianping implements java.io.Serializable{
     
     private String lng; //经度
     
-    private String lat; //维度
+    public String getBranch() {
+		return branch;
+	}
+
+	public void setBranch(String branch) {
+		this.branch = branch;
+	}
+
+	private String lat; //维度
+    
+    private String branch; //分校
 
     private ArrayList<String> shopinfo; //商户简介
     

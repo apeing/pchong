@@ -12,16 +12,17 @@ import java.util.List;
 import java.util.Map;
 
 import com.nihao.pachong.Dianping;
-import com.nihao.pachong.MysqlHelper;
 import com.nihao.pachong.Pachong;
+import com.nihao.pachong.Course;
 
 public class Oracleapp {
+
 	public static void main(String[] args) throws SQLException, InterruptedException{
 		Pachong app = new Pachong();
+		List<Map<String, String>> urlnew = new ArrayList<Map<String, String>>();
+		urlnew = app.crawler("http://www.dianping.com/chengdu/ch75/g2910",2);
 		Connection connection = OracleConnPool.getConnection();
-		List<Map<String, String>> mapfirst = new ArrayList<Map<String, String>>();
-		mapfirst = app.crawler("http://www.dianping.com/chengdu/education",1);
-		ResultSet rs = MysqlHelper.executeQuery(connection, "select max(id) from TRAIN_SCHOOL");
+		ResultSet rs = OracleHelper.executeQuery(connection,"select max(id) from TRAIN_SCHOOL");
 		int num = 0;
 		if (rs.next()) {
 			String str = rs.getString(1);
@@ -30,57 +31,56 @@ public class Oracleapp {
     			num = Integer.parseInt(str);
     		}
 		}
-		for(Map<String, String> fir : mapfirst){
-		//	if(num > 10){
-		//		connection.close();
-		//		return ;
-		//	}
-			if(fir.get("type") == "外语培训"){
-				continue;
-			}
-			List<Map<String, String>> urlnew = new ArrayList<Map<String, String>>();
-			urlnew = app.crawler(fir.get("url"),2);
-			for(Map<String, String> sec : urlnew){
-				num++;
-				System.out.println("num : " + num);
-				Dianping obj = new Dianping();
-				obj = app.runcraw(sec.get("url"),3);
-				
-		//		System.out.println("CONTACT_PHONE : " + obj.getShopPhone());
+		
+		for(Map<String, String> sec : urlnew){
+			num++;
+			Dianping obj = new Dianping();
+			obj = app.runcraw(sec.get("url"),3);
+			String tmptypeid = "558";
+			String tmptypename = "其他院校";
+			System.out.println("name : " + obj.getshopname());
+			String sqlstr = "select id,TRAIN_TYPE_ID,TRAIN_TYPE_NAME from TRAIN_SCHOOL where SCHOOL_NAME='" + obj.getshopname() + "'";
+			ResultSet rs2 = OracleHelper.executeQuery(connection,sqlstr);
+			if (rs2.next()) {
+				String numstr = rs2.getString(1);
+				String namestr = rs2.getString(3);
+				String num3str = rs2.getString(2);
+	    		if(numstr != null & numstr != ""){
+	    			System.out.println("str : " + numstr);
+	    			int num2 = Integer.parseInt(numstr);
+	    			num3str +=tmptypeid + ",";
+	    			namestr +=tmptypename + ",";
+	                String updatestr = "UPDATE TRAIN_SCHOOL SET TRAIN_TYPE_ID = '" + num3str + "', TRAIN_TYPE_NAME = '"+ namestr +"' WHERE ID = " + num2;
+	                System.out.println("UPDATE : " + updatestr);
+	                int exeCount = OracleUtils.Update(updatestr); 
+	                Thread.sleep(2000);
+	    		}
+			}else{
 				String addr = obj.getShopAddress();
-		//		System.out.println("ADDRESS : " + addr.substring(4,addr.length()-4));
-		//		System.out.println("MERCHANT_NAME : " + obj.getshopname());
-		//		System.out.println("LONGITUDE : " + obj.getLng());
-		//		System.out.println("LATITUDE : " + obj.getLat());
-		//		System.out.println("BANNER_URL : " + obj.getBanner());
-		//		System.out.println("EFFECT_SCORE : " + sec.get("效果"));
-		//		System.out.println("TEACHER_SCORE : " + sec.get("师资"));
-		//		System.out.println("ENVIRONMENT_SCORE : " + sec.get("环境"));
-		//		System.out.println("COMMENT_NUM : " + sec.get("commentsnum"));
-				
-				//String infos = "";
-				Map<String, String> infos = new HashMap<String, String>();
-	            for(String item : obj.getShopInfo()){
-	            	System.out.println("item : " + item.trim());
-	            	String tmpstr = item.trim();
-	            	infos.put(tmpstr.substring(0,4),tmpstr.substring(5,tmpstr.length()));
-	            	System.out.println("key : " + tmpstr.substring(0,4) + "value : " + tmpstr.substring(5,tmpstr.length()));
-	            }
-	      //      SimpleDateFormat formatter = new SimpleDateFormat("yyyy");
-	       //     ParsePosition pos = new ParsePosition(0);
-	       //     Date strtodate = formatter.parse(infos.get("创立时间").substring(0,4), pos);
-	       //     System.out.println("Date : " + strtodate);
-	       //     System.out.println("infos : " + infos);
-	            
-				String insertstr = "insert into TRAIN_SCHOOL(ID,MERCHANT_NAME,BANNER_URL,INSTITUTION_INFO,LONGITUDE,LATITUDE,ADDRESS,CONTACT_PHONE,COMMENT_NUM,EFFECT_SCORE,TEACHER_SCORE,ENVIRONMENT_SCORE,STATE,STAR_LEVEL,TRAIN_TYPE_ID,TRAIN_TYPE_NAME) values(";
-	            insertstr += num + ",'" + obj.getshopname() + "','" + obj.getBanner() + "','" + infos.get("商户介绍") + "','" + obj.getLng() + "','" + obj.getLat() + "','";
-	            
-	            insertstr +=addr.substring(4,addr.length()-4) +"','" +  obj.getShopPhone() + "'," + sec.get("commentsnum") +",'" + sec.get("效果") + "','" + sec.get("师资") + "','" + sec.get("环境") + "','" + "1','" + sec.get("stars") + "',1,'" + fir.get("type") + "')";
-	            System.out.println("insertstr : " + insertstr);
-	            int exeCount = OracleHelper.executeUpdate(connection, insertstr); 
-	            Thread.sleep(2000);
+    			
+    			Map<String, String> infos = new HashMap<String, String>();
+    			//商户简介
+                for(String item : obj.getShopInfo()){
+                	System.out.println("item : " + item.trim());
+                	String tmpstr = item.trim();
+                	infos.put(tmpstr.substring(0,4),tmpstr.substring(5,tmpstr.length()));
+                	System.out.println("key : " + tmpstr.substring(0,4) + "value : " + tmpstr.substring(5,tmpstr.length()));
+                }
+                //商户课程
+                String coursestr = "";
+                for(Course objcourse : obj.getShopCourses()){
+                	coursestr += objcourse.getTitle() + ":" + objcourse.getCur() + ";";
+                }
+    			String insertstr = "insert into TRAIN_SCHOOL(ID,SCHOOL_NAME,BANNER_URL,INSTITUTION_INFO,LONGITUDE,LATITUDE,ADDRESS,CONTACT_PHONE,COMMENT_NUM,EFFECT_SCORE,TEACHER_SCORE,ENVIRONMENT_SCORE,STATE,STAR_LEVEL,TRAIN_TYPE_ID,TRAIN_TYPE_NAME,COURSE_INFO,CAMPUS_SITUATION) values(";
+                insertstr += num + ",'" + obj.getshopname() + "','" + obj.getBanner() + "','" + infos.get("商户介绍") + "','" + obj.getLng() + "','" + obj.getLat() + "','";
+                
+                insertstr +=addr.substring(4,addr.length()) +"','" +  obj.getShopPhone() + "'," + sec.get("commentsnum") +",'" + sec.get("效果") + "','" + sec.get("师资") + "','" + sec.get("环境") + "','" + "1','" + sec.get("stars") + "','," + tmptypeid + ",','," + tmptypename + ",','" + coursestr +"','" + obj.getBranch()+ "')";
+                System.out.println("insertstr : " + insertstr);
+                int exeCount = OracleUtils.Update(insertstr); 
+                Thread.sleep(2000);
 			}
 		}
 		connection.close();
 	}
+	
 }

@@ -39,7 +39,7 @@ public class Pachong {
 		Dianping obj = new Dianping();
 		Connection conn = Jsoup.connect(urlstr);
         // 修改http包中的header,伪装成浏览器进行抓取
-		conn.header("Cookie", "_lxsdk_cuid=164f9acba13c8-0d814121742ee8-6f16107f-1fa400-164f9acba13c8; _lxsdk=164f9acba13c8-0d814121742ee8-6f16107f-1fa400-164f9acba13c8; _hc.v=2f9d8e40-7d78-3cec-428c-c73ff7951921.1533197204; __mta=46071579.1533197962954.1533197962954.1533198217226.2; _tr.u=szUIdZ0APn0Wxxvk; cityid=1; citypinyin=shanghai; cityname=5LiK5rW3; aburl=1; __utma=1.1738877636.1534238653.1534238653.1534238653.1; __utmz=1.1534238653.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); cy=8; cye=chengdu; s_ViewType=10; __utma=205923334.611835561.1534382841.1534382841.1534382841.1; __utmz=205923334.1534382841.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); looyu_id=c9f67c91afae8acb262c64411ff9a6b3f8_51868%3A1; Hm_lvt_dbeeb675516927da776beeb1d9802bd4=1533197796,1533518649,1533778098,1534471239; _lx_utm=utm_source%3DBaidu%26utm_medium%3Dorganic; Hm_lvt_4c4fc10949f0d691f3a2cc4ca5065397=1534815972,1534924455,1534987297,1535078284; Hm_lpvt_4c4fc10949f0d691f3a2cc4ca5065397=1535078284; _lxsdk_s=16569cb84f0-a5e-d3-7b7%7C%7C106");
+		conn.header("Cookie", "_lxsdk_cuid=164f9acba13c8-0d814121742ee8-6f16107f-1fa400-164f9acba13c8; _lxsdk=164f9acba13c8-0d814121742ee8-6f16107f-1fa400-164f9acba13c8; _hc.v=2f9d8e40-7d78-3cec-428c-c73ff7951921.1533197204; __mta=46071579.1533197962954.1533197962954.1533198217226.2; _tr.u=szUIdZ0APn0Wxxvk; cityid=1; citypinyin=shanghai; cityname=5LiK5rW3; aburl=1; __utma=1.1738877636.1534238653.1534238653.1534238653.1; __utmz=1.1534238653.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); cy=8; cye=chengdu; s_ViewType=10; __utma=205923334.611835561.1534382841.1534382841.1534382841.1; __utmz=205923334.1534382841.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); looyu_id=c9f67c91afae8acb262c64411ff9a6b3f8_51868%3A1; Hm_lvt_dbeeb675516927da776beeb1d9802bd4=1533197796,1533518649,1533778098,1534471239; _lx_utm=utm_source%3DBaidu%26utm_medium%3Dorganic; Hm_lvt_4c4fc10949f0d691f3a2cc4ca5065397=1535434888,1535507669,1535531020,1535593033; Hm_lpvt_4c4fc10949f0d691f3a2cc4ca5065397=1535593033; _lxsdk_s=16589b9721e-519-8d0-5d4%7C%7C36");
         conn.header("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.62 Safari/537.36");
         Document doc = null;
         try {
@@ -57,6 +57,7 @@ public class Pachong {
             Element banner = doc.getElementById("basicInfoPic");
             //banner图片
             Elements bannerpic = banner.select("img");
+            System.out.println("bannerpic : " + bannerpic.attr("src").toString());
             obj.setBanner(bannerpic.attr("src").toString());
             //爬取经纬度
             Elements shopjw = doc.select("script");
@@ -89,6 +90,19 @@ public class Pachong {
             	teacherobj.setDetail(item.select("div>div.intro>span.type").text());
             	shoptheachers.add(teacherobj);
             }
+            //分校信息
+            Elements nodeschool = doc.getElementsByClass("shop-branchs J_shop-branchs J_shop-branchs Hide");
+            String branch = "";
+            if(nodeschool.isEmpty()){
+            
+            }else{
+            	Elements anodes = nodeschool.select("a.item");            	
+            	for(Element item : anodes){
+            		branch += item.select("h3.name").text().trim() + ":" + item.select("p.address").text().trim() + ";";
+            	}
+            }
+            System.out.println("branch : " + branch);
+            obj.setBranch(branch);
             //官方图片
             ArrayList<Shoppicture> shoppictures = new ArrayList<Shoppicture>();
             Elements epics = doc.getElementsByClass("mod pics J_pics");
@@ -302,10 +316,17 @@ public class Pachong {
 	        	mapobj.put("stars",m.replaceAll("").trim());
 	        	//评分
 	        	Elements comments = element.select("span.comment-list>span");
-	        	for(Element obj : comments){
-	        		String tmp = obj.select("span").text().trim();
-	        		mapobj.put(tmp.substring(0,2),tmp.substring(2,5));
+	        	if(comments.isEmpty()){
+	        		mapobj.put("效果","0.0");
+	        		mapobj.put("师资","0.0");
+	        		mapobj.put("环境","0.0");
+	        	}else{
+	        		for(Element obj : comments){
+		        		String tmp = obj.select("span").text().trim();
+		        		mapobj.put(tmp.substring(0,2),tmp.substring(2,5));
+		        	}
 	        	}
+	        	
         	}
         	maptwos.add(mapobj);
         }
