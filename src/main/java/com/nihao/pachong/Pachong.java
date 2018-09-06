@@ -34,12 +34,41 @@ import java.util.regex.Pattern;
 public class Pachong {
 	List<String> info_urls = new ArrayList<String>();//爬取的详情的url集合
 	List<String> info_urls2 = new ArrayList<String>();//爬取商户的url集合
+	private String cookies = "_lxsdk_cuid=164f9acba13c8-0d814121742ee8-6f16107f-1fa400-164f9acba13c8; _lxsdk=164f9acba13c8-0d814121742ee8-6f16107f-1fa400-164f9acba13c8; _hc.v=2f9d8e40-7d78-3cec-428c-c73ff7951921.1533197204; __mta=46071579.1533197962954.1533197962954.1533198217226.2; _tr.u=szUIdZ0APn0Wxxvk; cityid=1; citypinyin=shanghai; cityname=5LiK5rW3; aburl=1; __utma=1.1738877636.1534238653.1534238653.1534238653.1; __utmz=1.1534238653.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); cy=8; cye=chengdu; s_ViewType=10; __utma=205923334.611835561.1534382841.1534382841.1534382841.1; __utmz=205923334.1534382841.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); looyu_id=c9f67c91afae8acb262c64411ff9a6b3f8_51868%3A1; Hm_lvt_dbeeb675516927da776beeb1d9802bd4=1533197796,1533518649,1533778098,1534471239; _lx_utm=utm_source%3DBaidu%26utm_medium%3Dorganic; Hm_lvt_4c4fc10949f0d691f3a2cc4ca5065397=1535531020,1535593033,1535943039,1536025375; Hm_lpvt_4c4fc10949f0d691f3a2cc4ca5065397=1536025375; _lxsdk_s=165a31c819f-2ef-554-5c2%7C%7C25";
 //	List<Map<String, String>> mapones = new ArrayList<Map<String, String>>();
+	//爬取课程网页信息
+	public com.nihao.pachong.bean.Course runcourse(String urlstr){
+		com.nihao.pachong.bean.Course obj = new com.nihao.pachong.bean.Course();
+		Connection conn = Jsoup.connect(urlstr);
+        // 修改http包中的header,伪装成浏览器进行抓取
+		conn.header("Cookie", cookies);
+        conn.header("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.62 Safari/537.36");
+        Document doc = null;
+        try{
+        	doc = conn.get();
+        	//System.out.println("str : " + doc);
+        	Element info = doc.getElementById("courseSummary");
+        	Elements courseinfo = info.select("ul>li>div.item");
+        	Map<String, String> infos = new HashMap<String, String>();
+        	for(Element item : courseinfo){
+        		String title = item.select("span[class=\"title\"]").text();
+        		String infotext = item.select("span[class=\"info\"]").text();
+        		infos.put(title,infotext);
+        	}
+        	obj.setInfos(infos);
+        	System.out.println("info : " + info);
+        }
+        catch(IOException e) {
+            e.printStackTrace();
+        }
+		return obj;
+	}
+	//爬取商户网页信息
 	public Dianping runcraw(String urlstr,int index){
 		Dianping obj = new Dianping();
 		Connection conn = Jsoup.connect(urlstr);
         // 修改http包中的header,伪装成浏览器进行抓取
-		conn.header("Cookie", "_lxsdk_cuid=164f9acba13c8-0d814121742ee8-6f16107f-1fa400-164f9acba13c8; _lxsdk=164f9acba13c8-0d814121742ee8-6f16107f-1fa400-164f9acba13c8; _hc.v=2f9d8e40-7d78-3cec-428c-c73ff7951921.1533197204; __mta=46071579.1533197962954.1533197962954.1533198217226.2; _tr.u=szUIdZ0APn0Wxxvk; cityid=1; citypinyin=shanghai; cityname=5LiK5rW3; aburl=1; __utma=1.1738877636.1534238653.1534238653.1534238653.1; __utmz=1.1534238653.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); cy=8; cye=chengdu; s_ViewType=10; __utma=205923334.611835561.1534382841.1534382841.1534382841.1; __utmz=205923334.1534382841.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); looyu_id=c9f67c91afae8acb262c64411ff9a6b3f8_51868%3A1; Hm_lvt_dbeeb675516927da776beeb1d9802bd4=1533197796,1533518649,1533778098,1534471239; _lx_utm=utm_source%3DBaidu%26utm_medium%3Dorganic; Hm_lvt_4c4fc10949f0d691f3a2cc4ca5065397=1535434888,1535507669,1535531020,1535593033; Hm_lpvt_4c4fc10949f0d691f3a2cc4ca5065397=1535593033; _lxsdk_s=16589b9721e-519-8d0-5d4%7C%7C36");
+		conn.header("Cookie", cookies);
         conn.header("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.62 Safari/537.36");
         Document doc = null;
         try {

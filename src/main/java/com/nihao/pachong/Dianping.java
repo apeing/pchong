@@ -8,6 +8,7 @@ import com.nihao.pachong.model.Shoppicture;
 import com.nihao.pachong.model.Teacher;
 
 
+
 @SuppressWarnings("serial")
 public class Dianping implements java.io.Serializable{
 	private Long id;//商户id

@@ -1,6 +1,7 @@
 package com.nihao.pachong.bean;
 
 import java.io.Serializable;
+import java.util.Map;
 
 public class Course implements Serializable{
 	private static final long serialVersionUID = 1L;
@@ -11,6 +12,13 @@ public class Course implements Serializable{
 	private String desc ; //描述
 	private String img ; //封面图片地址
 	private String address ; //课程地址
+	private Map<String, String> infos; //课程简介列表
+	public Map<String, String> getInfos() {
+		return infos;
+	}
+	public void setInfos(Map<String, String> infos) {
+		this.infos = infos;
+	}
 	public int getId() {
 		return id;
 	}
