@@ -21,6 +21,27 @@ public class Company {
 	private String nsrzz;//纳税人资质
 	private String cbrs;//参保人数
 	private String ywmc;//英文名称
+	private String infos;//信息
+	private String url;//地址
+	private String contact;//联系方式
+	public String getContact() {
+		return contact;
+	}
+	public void setContact(String contact) {
+		this.contact = contact;
+	}
+	public String getInfos() {
+		return infos;
+	}
+	public void setInfos(String infos) {
+		this.infos = infos;
+	}
+	public String getUrl() {
+		return url;
+	}
+	public void setUrl(String url) {
+		this.url = url;
+	}
 	public String getYwmc() {
 		return ywmc;
 	}
