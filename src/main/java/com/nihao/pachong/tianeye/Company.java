@@ -3,6 +3,13 @@ package com.nihao.pachong.tianeye;
 public class Company {
 	private String name;//企业名称
 	private String status;//企业状态
+	private String type;//企业类型
+	public String getType() {
+		return type;
+	}
+	public void setType(String type) {
+		this.type = type;
+	}
 	private String industry;//所属行业
 	private String score;//信用分数
 	private String boss;//责任人
