@@ -13,17 +13,17 @@ import com.nihao.pachong.oracle.OracleHelper;
 public class Oraclecha {
 	public static void main(String[] args) throws NumberFormatException, SQLException, InterruptedException{
 		Connection connection = MysqlConnPool.getConnection();
-		ResultSet rs = MysqlHelper.executeQuery(connection,"select ID,url,infos from company where ID<=1200 and ID >=1059");
+		ResultSet rs = MysqlHelper.executeQuery(connection,"select schoolid,url,zhijing from company where ID<=1200 and ID >=1");
 		int num = 0;
 		while(rs.next()) {
-			String id = rs.getString(1);
+			String schoolid = rs.getString(1);
 			String url = rs.getString(2);
-			String infos = rs.getString(3);
-    		System.out.println(id + " : " + url);
-    		if(infos != null & infos != ""){
-    			num = Integer.parseInt(id);
-    			Connection connection2 = MysqlConnPool.getInstance().getConnection();
-    			Company obj = new Tianweb().runSecond(url);
+			String zhijing = rs.getString(3);
+    		System.out.println(schoolid + " : " + url);
+    		if(zhijing != null & schoolid != null){
+    			num = Integer.parseInt(schoolid);
+    			Connection connection2 = OracleConnPool.getConnection();
+    	//		Company obj = new Tianweb().runSecond(url);
     			
     				
     		//		System.out.println("rs2 run");
@@ -35,11 +35,10 @@ public class Oraclecha {
     	//		System.out.println("znum1 : " + znum1);
     	//		String money =infos.substring(znum1+5,znum2);
     	//		System.out.println("money : " + money);
-				String updatestr = "update company set gszch = '" + obj.getGszch() + "' , industry = '" + obj.getIndustry() + "' , zzjgdm = '" ;
-				updatestr += obj.getZzjgdm() + "' , tyxydm = '" + obj.getTyxydm() + "' , nsrsbh = '" + obj.getNsrsbh()+ "' , address = '" +obj.getAddress() + "' where id = " + num;
+				String updatestr = "update TRAIN_SCHOOL set REGISTER_CAPITAL = '" + zhijing + "' where id = " + num;
     	//		String updatestr2 = "update company set zhijing = '" + money + "' where id=" + num;
 				System.out.println(updatestr);
-				MysqlHelper.executeUpdate(connection2, updatestr);
+				OracleHelper.executeQuery(connection2, updatestr);
     				
     			
     			connection2.close();

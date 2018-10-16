@@ -6,6 +6,13 @@ public class Teacher implements Serializable{
 	private static final long serialVersionUID = 1L;
 	private int id;//id
 	private int shopid ; //商户id
+	private String shopname; //商户名
+	public String getShopname() {
+		return shopname;
+	}
+	public void setShopname(String shopname) {
+		this.shopname = shopname;
+	}
 	private String name ; //当前价格
 	private String year ; //教龄
 	private String type ; //教学语言

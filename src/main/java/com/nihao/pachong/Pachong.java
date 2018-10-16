@@ -34,8 +34,8 @@ import java.util.regex.Pattern;
 public class Pachong {
 	List<String> info_urls = new ArrayList<String>();//爬取的详情的url集合
 	List<String> info_urls2 = new ArrayList<String>();//爬取商户的url集合
-	private String cookies = "_lxsdk_cuid=164f9acba13c8-0d814121742ee8-6f16107f-1fa400-164f9acba13c8; _lxsdk=164f9acba13c8-0d814121742ee8-6f16107f-1fa400-164f9acba13c8; _hc.v=2f9d8e40-7d78-3cec-428c-c73ff7951921.1533197204; __mta=46071579.1533197962954.1533197962954.1533198217226.2; _tr.u=szUIdZ0APn0Wxxvk; cityid=1; citypinyin=shanghai; cityname=5LiK5rW3; aburl=1; __utma=1.1738877636.1534238653.1534238653.1534238653.1; __utmz=1.1534238653.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); cy=8; cye=chengdu; s_ViewType=10; __utma=205923334.611835561.1534382841.1534382841.1534382841.1; __utmz=205923334.1534382841.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); looyu_id=c9f67c91afae8acb262c64411ff9a6b3f8_51868%3A1; Hm_lvt_dbeeb675516927da776beeb1d9802bd4=1533197796,1533518649,1533778098,1534471239; _lx_utm=utm_source%3DBaidu%26utm_medium%3Dorganic; Hm_lvt_4c4fc10949f0d691f3a2cc4ca5065397=1535531020,1535593033,1535943039,1536025375; Hm_lpvt_4c4fc10949f0d691f3a2cc4ca5065397=1536025375; _lxsdk_s=165a31c819f-2ef-554-5c2%7C%7C25";
-//	List<Map<String, String>> mapones = new ArrayList<Map<String, String>>();
+	private String cookies = "_lxsdk_cuid=164f9acba13c8-0d814121742ee8-6f16107f-1fa400-164f9acba13c8; _lxsdk=164f9acba13c8-0d814121742ee8-6f16107f-1fa400-164f9acba13c8; _hc.v=2f9d8e40-7d78-3cec-428c-c73ff7951921.1533197204; __mta=46071579.1533197962954.1533197962954.1533198217226.2; _tr.u=szUIdZ0APn0Wxxvk; cityid=1; citypinyin=shanghai; cityname=5LiK5rW3; aburl=1; __utma=1.1738877636.1534238653.1534238653.1534238653.1; __utmz=1.1534238653.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); s_ViewType=10; __utma=205923334.611835561.1534382841.1534382841.1534382841.1; __utmz=205923334.1534382841.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); looyu_id=c9f67c91afae8acb262c64411ff9a6b3f8_51868%3A1; cy=8; cye=chengdu; Hm_lvt_dbeeb675516927da776beeb1d9802bd4=1539228227; _lx_utm=utm_source%3DBaidu%26utm_medium%3Dorganic; Hm_lvt_4c4fc10949f0d691f3a2cc4ca5065397=1539228700,1539324904,1539570007,1539655900; Hm_lpvt_4c4fc10949f0d691f3a2cc4ca5065397=1539674223; _lxsdk_s=1667ba47dca-fd7-cb6-e67%7C%7C334";
+	//	List<Map<String, String>> mapones = new ArrayList<Map<String, String>>();
 	//爬取课程网页信息
 	public com.nihao.pachong.bean.Course runcourse(String urlstr){
 		com.nihao.pachong.bean.Course obj = new com.nihao.pachong.bean.Course();
@@ -116,7 +116,7 @@ public class Pachong {
             	teacherobj.setImg(item.select("div>img").attr("lazy-src"));
             	teacherobj.setYear(item.select("div>div.intro>span.year").text());
             	teacherobj.setType(item.select("div>div.intro>span.type").text());
-            	teacherobj.setDetail(item.select("div>div.intro>span.type").text());
+            	teacherobj.setDetail(item.select("div>div.detail").text());
             	shoptheachers.add(teacherobj);
             }
             //分校信息
